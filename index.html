@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Movientações</title>
+</head>
+<body>
+  <div id="app">
+    <label>Íntegra do site:</label> <br />
+    <textarea v-model="integra" @blur="convert" style="width: 300px; height: 250px;">
+
+    </textarea>
+
+    <ul id="example-1">
+      <li v-for="movimentacao in movimentacoes" :key="movimentacao.data">
+        <input type="text" v-model="movimentacao.data" />
+        <input type="text" v-model="movimentacao.texto" />
+        <input type="text" v-model="movimentacao.hora" />
+      </li>
+    </ul>
+  </div>
+</body>
+<!-- production version, optimized for size and speed -->
+<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+
+<script>
+  var app = new Vue({
+    el: '#app',
+    data: {
+      integra: '',
+      movimentacoes: [
+
+      ]
+    },
+    methods: {
+      convert: function(){
+        var vm = this;       
+        var todasMovimentacoes = vm.integra.match(/[0-9][0-9]\s(jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)\s[2][0][0-9][0-9](.|\n)*?([0-9][0-9]):([0-9][0-9])/g);
+        console.log(todasMovimentacoes)
+        todasMovimentacoes.forEach(function(movimentacao, i) {
+
+          var arr = [
+            movimentacao.substr(0,11), 
+            // com regex: movimentacao.match(/(2)[0-9]\s(jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)\s[2][0][0-9][0-9]/g)[0],
+            // da pra aprimorar a parte do texto, dividindo todos os documentos em movimentações.
+            movimentacao.substr(11).slice(0,-5).replace(/(\r\n|\n|\r)/g," "), 
+            movimentacao.substr(-5)
+          ];
+          
+
+          let [date, texto, hora] = arr;
+
+          // se dentro do texto existir uma data, ele vai alterar a variavel date
+          const regexDate = /(2)[0-9][0-9]\s(jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)\s[2][0][0-9][0-9]/g;
+          const dateFounded = texto.match( regexDate );
+
+          if ( dateFounded ) {
+            date = dateFounded[0]
+            // se no texto existir uma data, o código deve remove-la
+            texto = texto.replace(regexDate, "")
+          }
+          
+          vm.movimentacoes.push(
+            {data: date, texto: texto, hora: hora}
+          )
+          console.log(date, texto, hora);
+
+        })
+
+
+      }
+    }
+  })
+</script>
+
+</html>
